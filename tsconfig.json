@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "nodemonConfig": {
+    "ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules"],
+    "watch": ["src"],
+    "exec": "npm start",
+    "ext": "ts"
+  },
+  "include": ["./src/backend/**/*.ts"],
+  "exclude": ["node_modules", ".vscode", "./src/frontend"]
+}

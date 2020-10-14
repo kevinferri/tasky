@@ -1,0 +1,8 @@
+build
+dist
+package-lock.json
+.git
+npm-debug.log
+.DS_Store
+node_modules
+src/backend/config.ts

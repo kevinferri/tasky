@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Tasky | Loading...</title>
+    <!-- Style dependencies -->
+    <link href="https://unpkg.com/normalize.css" rel="stylesheet" />
+    <!-- Blueprint stylesheets -->
+    <link href="https://unpkg.com/@blueprintjs/icons/lib/css/blueprint-icons.css" rel="stylesheet" />
+    <link href="https://unpkg.com/@blueprintjs/core/lib/css/blueprint.css" rel="stylesheet" />
+  <body>
+    <main id="mount-node"></main>
+    <script>
+       const htmlDecode=e=>{var t=document.createElement("div");return t.innerHTML=e,0===t.childNodes.length?"":t.childNodes[0].nodeValue};window.bootstrapData=JSON.parse(htmlDecode("<%= JSON.stringify(bootstrapData) %>"));
+    </script>
+    <script src="<%= bundlePath %>"></script>
+  </body>
+</html>
