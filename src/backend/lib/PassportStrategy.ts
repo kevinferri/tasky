@@ -4,6 +4,7 @@ import { PassportStatic } from 'passport';
 
 import User, { IUser } from '../models/userModel';
 import Config from '../lib/Config';
+import { IDocumentQuery } from '../interfaces';
 
 export class PassportStrategy {
   passport: PassportStatic;
@@ -17,10 +18,9 @@ export class PassportStrategy {
       done(null, user._id);
     });
 
-    this.passport.deserializeUser((id, done) => {
-      User.findById(id, function (err, user) {
-        done(err, user);
-      });
+    this.passport.deserializeUser(async (id, done) => {
+      const user = await (User.findById(id) as IDocumentQuery).cache();
+      return done(null, user);
     });
 
     passport.use(

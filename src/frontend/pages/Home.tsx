@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { ViewerContext } from '../contexts/ViewerContext';
 import { Content } from '../components/Content';
@@ -29,23 +28,8 @@ export const Home = () => {
 
   return (
     <Content>
-      <Flex>
-        <div>
-          <h1>Hello, {viewer.name}!</h1>
-          <pre>{JSON.stringify(viewer, null, 2)}</pre>
-        </div>
-        <div>
-          <h1>{formatTime(now)}</h1>
-        </div>
-      </Flex>
+      <h1>Hello, {viewer.name}!</h1>
+      <h1>{formatTime(now)}</h1>
     </Content>
   );
 };
-
-const Flex = styled.div`
-  display: flex;
-
-  div:last-of-type {
-    margin-left: auto;
-  }
-`;

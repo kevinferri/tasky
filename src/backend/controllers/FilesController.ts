@@ -3,6 +3,7 @@ import * as cloudinary from 'cloudinary';
 import File from '../models/fileModel';
 import { IRequest, IResponse } from '../interfaces';
 import { Controller } from '../lib/Controller';
+import { bustCache } from '../lib/mongooseCache';
 
 class FilesController extends Controller {
   async GET(req: IRequest, res: IResponse) {
@@ -24,6 +25,8 @@ class FilesController extends Controller {
     }
 
     await File.deleteOne({ _id: fileId });
+
+    this._bustCache();
     res.status(204).json();
   }
 
@@ -43,6 +46,8 @@ class FilesController extends Controller {
         new: true,
       },
     );
+
+    this._bustCache();
     res.json(file);
   }
 
@@ -72,10 +77,15 @@ class FilesController extends Controller {
         secureUrl: result.secure_url,
       }).save();
 
+      this._bustCache();
       res.json(newFile);
     } catch (error) {
       res.status(400).json(error);
     }
+  }
+
+  private _bustCache() {
+    bustCache(File.collection.name);
   }
 }
 

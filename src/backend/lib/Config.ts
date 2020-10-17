@@ -12,6 +12,7 @@ export interface IConfig {
   GOOGLE_API_KEY: string;
   SESSION_NAME: string;
   SESSION_SECRET: string;
+  REDIS_URI: string;
 }
 
 class Config {

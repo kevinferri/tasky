@@ -1,26 +1,56 @@
 import * as React from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { FileInput, Intent, Spinner, Toast, Toaster } from '@blueprintjs/core';
+import {
+  Button,
+  FileInput,
+  Intent,
+  HTMLSelect,
+  Spinner,
+  Toast,
+  Toaster,
+} from '@blueprintjs/core';
 
 import { useGet, cache } from '../hooks/useApiResource';
 import { Content } from '../components/Content';
-import { FileTable } from '../components/FileTable';
+import { FilesTable } from '../components/FilesTable';
 import { Loader } from '../components/Loader';
 import { Error } from '../components/Error';
 import { IFile } from '../interfaces';
-import { FILES_ENDPOINT, FILES_FIELDS } from '../constants';
+import { FILES_ENDPOINT, FILES_QUERY_PARAMS } from '../constants';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useDidMountEffect } from '../hooks/useDidMountEffect';
 
-export const Files = () => {
-  const { data, isLoading, error } = useGet<IFile[]>(
-    `${FILES_ENDPOINT}?fields=${FILES_FIELDS}`,
-    FILES_ENDPOINT,
-  );
+interface Props {
+  sortDirection: string;
+  sortField: string;
+  setSortDirection: Dispatch<SetStateAction<string>>;
+  setSortField: Dispatch<SetStateAction<string>>;
+}
+
+export const Files = ({
+  sortDirection,
+  sortField,
+  setSortDirection,
+  setSortField,
+}: Props) => {
+  const BASE_REQUEST_URL = `${FILES_ENDPOINT}${FILES_QUERY_PARAMS}`;
   const [uploadingFile, setUploadingFile] = React.useState<File | null>(null);
   const prevCache: IFile[] = cache.get(FILES_ENDPOINT);
+  const { data, isLoading, error } = useGet<IFile[]>(
+    `${BASE_REQUEST_URL}&sort=${sortDirection}${sortField}`,
+    FILES_ENDPOINT,
+  );
 
   useDocumentTitle('Files');
+
+  useDidMountEffect(async () => {
+    const { data } = await axios.get(
+      `${BASE_REQUEST_URL}&sort=${sortDirection}${sortField}`,
+    );
+    cache.set(FILES_ENDPOINT, data);
+  }, [sortField, sortDirection]);
 
   if (isLoading && !data) {
     return <Loader />;
@@ -74,7 +104,42 @@ export const Files = () => {
             }}
           />
         </UploadArea>
-        <FileTable files={data} />
+        <Sorter>
+          <h4>Sort: </h4>
+          <HTMLSelect
+            minimal
+            value={sortField}
+            options={[
+              {
+                value: 'createdAt',
+                label: 'Uploaded on',
+              },
+              {
+                value: 'fileName',
+                label: 'Name',
+              },
+              {
+                value: 'resourceType',
+                label: 'Type',
+              },
+              {
+                value: 'fileSize',
+                label: 'Size',
+              },
+            ]}
+            onChange={async (event) => {
+              setSortField(event.target.value);
+            }}
+          />
+          <Button
+            minimal
+            icon={sortDirection === '-' ? 'arrow-down' : 'arrow-up'}
+            onClick={() => {
+              setSortDirection(sortDirection === '-' ? '' : '-');
+            }}
+          />
+        </Sorter>
+        <FilesTable files={data} />
       </Content>
     </div>
   );
@@ -95,4 +160,14 @@ const UploadSpinner = styled(Spinner)`
   .bp3-spinner-head {
     stroke: white;
   }
+`;
+
+const Sorter = styled.div`
+  h4 {
+    margin-right: 5px;
+  }
+
+  align-items: center;
+  display: flex;
+  margin-bottom: 20px;
 `;

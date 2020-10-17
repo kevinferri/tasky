@@ -5,7 +5,7 @@ import { Button, Checkbox, InputGroup, NonIdealState } from '@blueprintjs/core';
 
 import { useGet, cache } from '../hooks/useApiResource';
 import { Content } from '../components/Content';
-import { TODOS_ENDPOINT, TODOS_FIELDS } from '../constants';
+import { TODOS_ENDPOINT, TODOS_QUERY_PARAMS } from '../constants';
 import { ITodo } from '../interfaces';
 import { Loader } from '../components/Loader';
 import { Error } from '../components/Error';
@@ -13,7 +13,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export const Todos = () => {
   const { data, isLoading, error } = useGet<ITodo[]>(
-    `${TODOS_ENDPOINT}?fields=${TODOS_FIELDS}`,
+    `${TODOS_ENDPOINT}${TODOS_QUERY_PARAMS}`,
     TODOS_ENDPOINT,
   );
   const ref = React.useRef(null);
@@ -35,11 +35,15 @@ export const Todos = () => {
       <form
         onSubmit={async (event) => {
           event.preventDefault();
-          const { data } = await axios.post(TODOS_ENDPOINT, {
-            name: ref.current.value,
-          });
-          cache.set(TODOS_ENDPOINT, [...prevCache, data]);
-          ref.current.value = '';
+          const { value } = ref.current;
+
+          if (value.trim().length > 0) {
+            const { data } = await axios.post(TODOS_ENDPOINT, {
+              name: ref.current.value,
+            });
+            cache.set(TODOS_ENDPOINT, [...prevCache, data]);
+            ref.current.value = '';
+          }
         }}
       >
         <InputGroup
@@ -109,6 +113,10 @@ const StyledTodos = styled.div`
 
 const CheckboxContainer = styled.div`
   display: flex;
+
+  > label {
+    margin-bottom: 10px;
+  }
 
   button {
     margin-left: auto;

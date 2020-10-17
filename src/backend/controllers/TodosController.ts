@@ -1,13 +1,12 @@
 import Todo from '../models/todoModel';
 import { IRequest, IResponse } from '../interfaces';
 import { Controller } from '../lib/Controller';
+import { bustCache } from '../lib/mongooseCache';
 
 class TodosController extends Controller {
   async GET(req: IRequest, res: IResponse) {
-    const todos = await super.query(
-      req,
-      Todo.find({ creatorId: super.getCurUser(req)._id }),
-    );
+    const user = super.getCurUser(req);
+    const todos = await super.query(req, Todo.find({ creatorId: user._id }));
 
     res.json(todos);
   }
@@ -19,6 +18,8 @@ class TodosController extends Controller {
         creatorId: super.getCurUser(req)._id,
       },
     }).save();
+
+    this._bustCache();
     res.json(newTodo);
   }
 
@@ -38,6 +39,9 @@ class TodosController extends Controller {
         new: true,
       },
     );
+
+    this._bustCache();
+
     res.json(todo);
   }
 
@@ -51,7 +55,13 @@ class TodosController extends Controller {
     }
 
     await Todo.deleteOne({ _id: todoId });
+    this._bustCache();
+
     res.status(204).json();
+  }
+
+  private _bustCache() {
+    bustCache(Todo.collection.name);
   }
 }
 

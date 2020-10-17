@@ -17,7 +17,7 @@ const renderAsset = (file: IFile): React.ReactNode => {
   }
 
   if (file.resourceType === 'image') {
-    return <img src={file.secureUrl} />;
+    return <img title={file.fileName} src={file.secureUrl} />;
   }
 };
 

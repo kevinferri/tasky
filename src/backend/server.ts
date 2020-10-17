@@ -10,23 +10,24 @@ import connectMongodbSession = require('connect-mongodb-session');
 import Config from './lib/Config';
 import { router } from './router';
 import { PassportStrategy } from './lib/PassportStrategy';
+import { applyMongooseCachedQueryMixins } from './lib/mongooseCache';
 
 const app = express();
 const PORT = Config.get('PORT');
 
 /**
- * Parse application/json
+ * Parse application/json.
  */
 app.use(bodyParser.json({ limit: '1gb' }));
 app.use(bodyParser.urlencoded({ limit: '1gb', extended: true }));
 
 /**
- * Set static path
+ * Set static path.
  */
 app.use(express.static(path.join(__dirname, './../../build')));
 
 /**
- * Connect to database
+ * Connect to database.
  */
 mongoose.connect(Config.get('DB_URL'), {
   useNewUrlParser: true,
@@ -34,14 +35,20 @@ mongoose.connect(Config.get('DB_URL'), {
   useFindAndModify: false,
 });
 mongoose.set('useCreateIndex', true);
+mongoose.set('debug', true);
 
 /**
- * Set up passport strategy
+ * Allow Redis caching of Mongoose queries.
+ */
+applyMongooseCachedQueryMixins(mongoose);
+
+/**
+ * Set up passport strategy.
  */
 new PassportStrategy(passport).initStrategy();
 
 /**
- * Set up session store
+ * Set up session store.
  */
 const MongoDBStore = connectMongodbSession(session);
 app.use(
@@ -64,12 +71,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 /**
- * Set up routes
+ * Set up routes.
  */
 router(app, passport);
 
 /**
- * Configure cloudinary
+ * Configure cloudinary.
  */
 cloudinary.v2.config({
   cloud_name: Config.get('CLOUDINARY_CLOUD_NAME'),
@@ -78,10 +85,13 @@ cloudinary.v2.config({
 });
 
 /**
- * Use ejs for view engine
+ * Use ejs for view engine.
  */
 app.set('view engine', 'ejs');
 
+/**
+ * Start thte server.
+ */
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

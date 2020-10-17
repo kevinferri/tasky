@@ -1,6 +1,4 @@
-import { DocumentQuery } from 'mongoose';
-
-import { IRequest, IResponse } from '../interfaces';
+import { IDocumentQuery, IRequest } from '../interfaces';
 
 export abstract class Controller {
   readonly DEFAULT_LIMIT = 25;
@@ -54,19 +52,21 @@ export abstract class Controller {
    * `sort`    - How the query should be sorted.
    * `limit`   - How many documents the query should return.
    */
-  async query(req: IRequest, query: DocumentQuery<any, any, {}>) {
-    const queryParams = this.getQueryParams(req);
-    const sort = (queryParams.sort as string) || '';
-    let limit = parseInt(queryParams.limit as string);
+  async query(req: IRequest, query: IDocumentQuery) {
+    let { sort, limit } = <{ sort: string; limit: string }>(
+      this.getQueryParams(req)
+    );
+    let limitN = parseInt(limit);
 
-    if (!limit || limit > this.MAX_LIMIT || limit < this.MIN_LIMIT) {
-      limit = this.DEFAULT_LIMIT;
+    if (!limit || limitN > this.MAX_LIMIT || limitN < this.MIN_LIMIT) {
+      limitN = this.DEFAULT_LIMIT;
     }
 
     return await query
       .select(this._getReqFields(req))
-      .limit(limit)
+      .limit(limitN)
       .sort(sort)
+      .cache()
       .exec();
   }
 }

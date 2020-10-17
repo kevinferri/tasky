@@ -18,7 +18,7 @@ import {
 import { cache } from '../hooks/useApiResource';
 import { bytesToSize } from '../helpers/bytesToSize';
 import { IFile } from '../interfaces';
-import { FileDialog } from '../components/FileDialog';
+import { FileDialog } from './FileDialog';
 import { FILES_ENDPOINT } from '../constants';
 
 interface Props {
@@ -41,7 +41,7 @@ const renderPreview = (file: IFile): React.ReactNode => {
   );
 };
 
-export const FileTable = ({ files }: Props) => {
+export const FilesTable = ({ files }: Props) => {
   const [openFileForDialog, setOpenFileForDialog] = React.useState(null);
   const [toastMessage, setToastMessage] = React.useState(null);
   const prevCache: IFile[] = cache.get(FILES_ENDPOINT);
@@ -103,7 +103,7 @@ export const FileTable = ({ files }: Props) => {
                   />
                 </td>
                 <td>{bytesToSize(file.fileSize)}</td>
-                <td>{file.format}</td>
+                <td>{file.resourceType}</td>
                 <td>{new Date(file.createdAt).toLocaleDateString()}</td>
                 <td>
                   <ButtonGroup>

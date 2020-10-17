@@ -8,7 +8,7 @@ export interface ITodo extends Document {
   name: string;
 }
 
-const userSchema: Schema = new Schema({
+const todosSchema: Schema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
@@ -23,4 +23,4 @@ const userSchema: Schema = new Schema({
   name: { type: String },
 });
 
-export default model<ITodo>('Todo', userSchema);
+export default model<ITodo>('Todo', todosSchema);

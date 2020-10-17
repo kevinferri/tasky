@@ -6,6 +6,6 @@ export const Content = (props: { children: React.ReactNode }) => {
 };
 
 const StyledContent = styled.div`
-  padding: 10px 40px;
+  padding: 0 40px 40px 40px;
   position: relative;
 `;
